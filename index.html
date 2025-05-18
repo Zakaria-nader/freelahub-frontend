@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FreelaHub - تسجيل مستخدم جديد</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 400px; margin: 30px auto; padding: 10px;">
+  <h2 style="text-align: center;">تسجيل مستخدم جديد</h2>
+
+  <form id="registerForm">
+    <label for="email">البريد الإلكتروني:</label><br />
+    <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; margin-top: 5px;" /><br /><br />
+
+    <label for="password">كلمة السر:</label><br />
+    <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; margin-top: 5px;" /><br /><br />
+
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+      سجّل الآن
+    </button>
+  </form>
+
+  <p id="message" style="margin-top: 20px; text-align: center; font-weight: bold;"></p>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
+
+      message.style.color = 'black';
+      message.textContent = 'جاري التسجيل...';
+
+      try {
+        const response = await fetch('http://127.0.0.1:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          message.style.color = 'green';
+          message.textContent = data.message;
+          form.reset();
+        } else {
+          message.style.color = 'red';
+          message.textContent = data.message || 'حدث خطأ أثناء التسجيل';
+        }
+      } catch (error) {
+        message.style.color = 'red';
+        message.textContent = 'خطأ في الاتصال بالخادم، تأكد أن السيرفر شغال';
+      }
+    });
+  </script>
+</body>
+</html>
