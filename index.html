@@ -3,58 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FreelaHub - تسجيل مستخدم جديد</title>
+  <title>FreelaHub - تسجيل الدخول / تسجيل جديد</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      text-align: center;
+    }
+    form {
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #ccc;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      margin-top: 10px;
+      font-weight: bold;
+      color: red;
+      min-height: 20px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 400px; margin: 30px auto; padding: 10px;">
-  <h2 style="text-align: center;">تسجيل مستخدم جديد</h2>
+<body>
+  <h2>FreelaHub</h2>
 
+  <!-- نموذج تسجيل مستخدم جديد -->
   <form id="registerForm">
-    <label for="email">البريد الإلكتروني:</label><br />
-    <input type="email" id="email" name="email" required style="width: 100%; padding: 8px; margin-top: 5px;" /><br /><br />
-
-    <label for="password">كلمة السر:</label><br />
-    <input type="password" id="password" name="password" required style="width: 100%; padding: 8px; margin-top: 5px;" /><br /><br />
-
-    <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; cursor: pointer;">
-      سجّل الآن
-    </button>
+    <h3>تسجيل مستخدم جديد</h3>
+    <label for="regEmail">البريد الإلكتروني:</label>
+    <input type="email" id="regEmail" required />
+    <label for="regPassword">كلمة السر:</label>
+    <input type="password" id="regPassword" required />
+    <button type="submit">سجل الآن</button>
+    <div class="message" id="registerMessage"></div>
   </form>
 
-  <p id="message" style="margin-top: 20px; text-align: center; font-weight: bold;"></p>
+  <!-- نموذج تسجيل دخول -->
+  <form id="loginForm">
+    <h3>تسجيل الدخول</h3>
+    <label for="loginEmail">البريد الإلكتروني:</label>
+    <input type="email" id="loginEmail" required />
+    <label for="loginPassword">كلمة السر:</label>
+    <input type="password" id="loginPassword" required />
+    <button type="submit">دخول</button>
+    <div class="message" id="loginMessage"></div>
+  </form>
 
   <script>
-    const form = document.getElementById('registerForm');
-    const message = document.getElementById('message');
+    const backendURL = 'https://selective-brainy-clam.glitch.me';
 
-    form.addEventListener('submit', async (e) => {
+    // تسجيل مستخدم جديد
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const email = form.email.value.trim();
-      const password = form.password.value.trim();
-
-      message.style.color = 'black';
-      message.textContent = 'جاري التسجيل...';
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const messageEl = document.getElementById('registerMessage');
+      messageEl.textContent = '';
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/register', {
+        const response = await fetch(`${backendURL}/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
         });
-
         const data = await response.json();
 
         if (response.ok) {
-          message.style.color = 'green';
-          message.textContent = data.message;
-          form.reset();
+          messageEl.style.color = 'green';
+          messageEl.textContent = data.message || 'تم التسجيل بنجاح!';
         } else {
-          message.style.color = 'red';
-          message.textContent = data.message || 'حدث خطأ أثناء التسجيل';
+          messageEl.style.color = 'red';
+          messageEl.textContent = data.message || 'حدث خطأ أثناء التسجيل.';
         }
       } catch (error) {
-        message.style.color = 'red';
-        message.textContent = 'خطأ في الاتصال بالخادم، تأكد أن السيرفر شغال';
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'خطأ في الاتصال بالخادم.';
+      }
+    });
+
+    // تسجيل دخول (مؤقت - لأن الـ backend ما فيهش endpoint للدخول)
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const messageEl = document.getElementById('loginMessage');
+
+      // مؤقت: بس نعرض رسالة نجاح وهمي
+      if(email && password) {
+        messageEl.style.color = 'green';
+        messageEl.textContent = 'تم تسجيل الدخول بنجاح (وهمي)';
+      } else {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة السر';
       }
     });
   </script>
